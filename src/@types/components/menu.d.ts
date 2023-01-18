@@ -1,4 +1,5 @@
-import { IComponent } from '..';
+import type { IComponent } from '.';
+import type { TAsset } from '../core/assets';
 
 /**
  * Interface that represents the Menu component's API.
@@ -24,8 +25,26 @@ export interface IComponentMenu extends IComponent {
     mountHook(name: string, callback: CallableFunction): void;
 }
 
-/** Type representing the allowed i18n string identifiers for the Menu component. */
-type TI18nMenu = 'reset' | 'run' | 'stop';
+/** Type definition for feature flag toggles for the Menu component. */
+export type TFeatureFlagMenu = {
+    uploadFile: boolean;
+    recording: boolean;
+    exportDrawing: boolean;
+    loadProject: boolean;
+    saveProject: boolean;
+};
 
-/** Type representing the type overloaded i18n function for the Menu component. */
-export type TI18nFuncMenu = (key: TI18nMenu) => string;
+export type TInjectedMenu = {
+    flags: Record<keyof TFeatureFlagMenu, boolean>;
+    i18n: Record<'menu.run' | 'menu.stop' | 'menu.reset', string>;
+    assets: Record<
+        | 'image.icon.run'
+        | 'image.icon.stop'
+        | 'image.icon.reset'
+        | 'image.icon.saveProjectHTML'
+        | 'image.icon.exportDrawing'
+        | 'image.icon.startRecording'
+        | 'image.icon.stopRecording',
+        TAsset
+    >;
+};

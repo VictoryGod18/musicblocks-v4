@@ -1,7 +1,9 @@
-import { IComponentMenu } from '@/@types/components/menu';
+import type { IComponentDefinition } from '@/@types/components';
+import type { TInjectedEditor } from '@/@types/components/editor';
+import type { IComponentMenu } from '@/@types/components/menu';
 
-import { getComponent } from '@/config';
-import { setToolbarExtended, unsetToolbarExtended } from '@/view';
+import { getComponent } from '@/core/config';
+import { setToolbarExtended, unsetToolbarExtended } from '@/core/view';
 
 import {
     getElement,
@@ -14,7 +16,39 @@ import {
 } from './view';
 import { generateAPI, resetProgram } from './core';
 
-// -- public functions -----------------------------------------------------------------------------
+// == definition ===================================================================================
+
+export const definition: IComponentDefinition = {
+    dependencies: {
+        optional: ['menu'],
+        required: [],
+    },
+    flags: {},
+    strings: {
+        'editor.build': 'build button - build the program',
+        'editor.help': 'help button - show syntax information',
+    },
+    assets: [
+        'image.icon.build',
+        'image.icon.help',
+        'image.icon.pin',
+        'image.icon.unpin',
+        'image.icon.code',
+        'image.icon.close',
+    ],
+};
+
+export const injected: TInjectedEditor = {
+    flags: undefined,
+    // @ts-ignore
+    i18n: undefined,
+    // @ts-ignore
+    assets: undefined,
+};
+
+export const strings: { [key: string]: string } = definition.strings;
+
+// == public functions =============================================================================
 
 /**
  * Mounts the UI components.
@@ -148,10 +182,3 @@ export function setup(): Promise<void> {
         resolve();
     });
 }
-
-// == strings ======================================================================================
-
-export const strings: { [key: string]: string } = {
-    build: 'build button - build the program',
-    help: 'help button - show syntax information',
-};
