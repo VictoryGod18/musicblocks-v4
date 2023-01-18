@@ -1,19 +1,16 @@
 import React from 'react';
 import './index.scss';
 
-interface Props {
-    progress: number;
-}
 
-const Splash: React.FC<Props> = ({ progress }) => {
+// -- component definition -------------------------------------------------------------------------
+
+export default function Splash({ progress }: { progress: number }): JSX.Element {
     return (
-        <div className="container" id="splash">
-            <img className="logo" src="/logo.png" alt="Logo" />
-            <div className="progress-bar">
-                <div className="progress" style={{ width: `${progress}%` }} />
+        <div className="splash-container" id="splash">
+            <img className="splash-logo" src="/logo.png" alt="Logo" />
+            <div className="splash-progress-bar">
+                <div className="splash-progress" style={{ width: `${progress}%` }} />
             </div>
         </div>
     );
-};
-
-export default Splash;
+}
