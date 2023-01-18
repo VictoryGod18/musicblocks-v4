@@ -1,14 +1,26 @@
-export default {
+import type { TComponentMap } from '@/@types/components';
+
+const componentMap: TComponentMap = {
     editor: {
         path: 'editor',
-        expl: 'program code editor (YAML)',
+        name: 'Editor',
+        desc: 'Code editor for programs',
     },
     menu: {
         path: 'menu',
-        expl: 'menu bar on primary toolbar',
+        name: 'Menu',
+        desc: 'Menubar of the Primary Toolbar',
     },
     painter: {
         path: 'painter',
-        expl: 'component to create artworks',
+        name: 'Painter',
+        desc: 'Allows creation of artwork in the workspace',
+    },
+    singer: {
+        path: 'singer',
+        name: 'Singer',
+        desc: 'Allows creation of music in the workspace',
     },
 };
+
+export default componentMap;

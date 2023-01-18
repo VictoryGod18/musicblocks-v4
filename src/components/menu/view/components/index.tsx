@@ -1,20 +1,7 @@
 import { useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 
-// -- types ----------------------------------------------------------------------------------------
-
-import type { IFeatureFlags } from '@/@types';
-import type { TI18nFuncMenu } from '@/@types/components/menu';
-
-// -- resources ------------------------------------------------------------------------------------
-
-import svgStartRecording from '../resources/startRecording.svg';
-import svgStopRecording from '../resources/stopRecording.svg';
-import svgSaveProject from '../resources/saveProjectHTML.svg';
-import svgRun from '../resources/run.svg';
-import svgStop from '../resources/stop.svg';
-import svgReset from '../resources/reset.svg';
-import svgExportDrawing from '../resources/exportDrawing.svg';
+import { injected } from '../..';
 
 // -- stylesheet -----------------------------------------------------------------------------------
 
@@ -31,9 +18,7 @@ let _labels: {
   loadProject: string;
   saveProject: string;
 };
-let _flags: IFeatureFlags | undefined;
 let _states: { running: boolean } = { running: false };
-let _i18n: TI18nFuncMenu;
 
 let _btnUploadFileInLocalStorage: HTMLInputElement;
 let _btnStartRecording: HTMLButtonElement;
@@ -78,49 +63,46 @@ function Menu(props: { states: { running: boolean } }): JSX.Element {
 
     _mountedCallback();
 
-    if (_flags) {
-      Object.entries(_flags).forEach(([flag, value]) => {
-        flag;
-        value;
+    Object.entries(injected.flags).forEach(([flag, value]) => {
+      if (value === true) return;
 
-        if (value === true) return;
+      switch (flag) {
+        case 'uploadFile':
+          _btnUploadFileInLocalStorage.style.display = 'none';
+          break;
+        case 'recording':
+          _btnStartRecording.style.display = 'none';
+          _btnStopRecording.style.display = 'none';
+          break;
+        case 'exportDrawing':
+          _btnExportDrawing.style.display = 'none';
+          break;
+        case 'loadProject':
+          _btnLoadProject.style.display = 'none';
+          break;
+        case 'saveProject':
+          _btnSaveProject.style.display = 'none';
+          break;
+      }
+    });
 
-        switch (flag) {
-          case 'uploadFile':
-            _btnUploadFileInLocalStorage.style.display = 'none';
-            break;
-          case 'recording':
-            _btnStartRecording.style.display = 'none';
-            _btnStopRecording.style.display = 'none';
-            break;
-          case 'exportDrawing':
-            _btnExportDrawing.style.display = 'none';
-            break;
-          case 'loadProject':
-            _btnLoadProject.style.display = 'none';
-            break;
-          case 'saveProject':
-            _btnSaveProject.style.display = 'none';
-            break;
-        }
-      });
-    }
-
-    const loadSVG = (element: HTMLElement, svgSrc: string) => {
-      fetch(svgSrc)
-        .then((res) => res.text())
-        .then((svg) => (element.innerHTML += svg))
-        .then(() => (element.children[1] as SVGElement).classList.add('menu-btn-img'));
+    const loadAsset = (element: HTMLElement, assetIdentifier: string) => {
+      // @ts-ignore
+      element.innerHTML += injected.assets[assetIdentifier].data;
+      requestAnimationFrame(() =>
+        (element.children[1] as SVGElement).classList.add('menu-btn-img'),
+      );
     };
 
-    loadSVG(btnStartRecordingRef.current! as HTMLElement, svgStartRecording);
-    loadSVG(btnStopRecordingRef.current! as HTMLElement, svgStopRecording);
-    loadSVG(btnExportDrawingRef.current! as HTMLElement, svgExportDrawing);
-    // loadSVG(btnLoadProjectRef.current! as HTMLElement, svgSaveProject);
-    loadSVG(btnSaveProjectRef.current! as HTMLElement, svgSaveProject);
-    loadSVG(btnRunRef.current! as HTMLElement, svgRun);
-    loadSVG(btnStopRef.current! as HTMLElement, svgStop);
-    loadSVG(btnResetRef.current! as HTMLElement, svgReset);
+    loadAsset(btnRunRef.current! as HTMLElement, 'image.icon.run');
+    loadAsset(btnStopRef.current! as HTMLElement, 'image.icon.stop');
+    loadAsset(btnResetRef.current! as HTMLElement, 'image.icon.reset');
+
+    loadAsset(btnStartRecordingRef.current! as HTMLElement, 'image.icon.startRecording');
+    loadAsset(btnStopRecordingRef.current! as HTMLElement, 'image.icon.stopRecording');
+    loadAsset(btnExportDrawingRef.current! as HTMLElement, 'image.icon.exportDrawing');
+    // loadAsset(btnLoadProjectRef.current! as HTMLElement, 'image.icon.loadProject');
+    loadAsset(btnSaveProjectRef.current! as HTMLElement, 'image.icon.saveProjectHTML');
   }, []);
 
   return (
@@ -167,7 +149,7 @@ function Menu(props: { states: { running: boolean } }): JSX.Element {
         ref={btnRunRef}
       >
         <p className="menu-btn-label">
-          <span>{_i18n('run')}</span>
+          <span>{injected.i18n['menu.run']}</span>
         </p>
       </button>
       <button
@@ -175,12 +157,12 @@ function Menu(props: { states: { running: boolean } }): JSX.Element {
         ref={btnStopRef}
       >
         <p className="menu-btn-label">
-          <span>{_i18n('stop')}</span>
+          <span>{injected.i18n['menu.stop']}</span>
         </p>
       </button>
       <button className="menu-btn" ref={btnResetRef}>
         <p className="menu-btn-label">
-          <span>{_i18n('reset')}</span>
+          <span>{injected.i18n['menu.reset']}</span>
         </p>
       </button>
     </>
@@ -216,10 +198,6 @@ export function setup(
       saveProject: string;
     };
   },
-  utils: {
-    flags?: IFeatureFlags;
-    i18n: TI18nFuncMenu;
-  },
 ): Promise<{
   btnUploadFileInLocalStorage: HTMLInputElement;
   btnStartRecording: HTMLButtonElement;
@@ -233,8 +211,6 @@ export function setup(
 }> {
   _container = container;
   _labels = props.labels;
-  _flags = utils.flags;
-  _i18n = utils.i18n;
 
   return new Promise((resolve) => {
     _renderComponent();
