@@ -1,7 +1,6 @@
 import React from 'react';
 import './index.scss';
 
-
 // -- component definition -------------------------------------------------------------------------
 
 export default function Splash({ progress }: { progress: number }): JSX.Element {
